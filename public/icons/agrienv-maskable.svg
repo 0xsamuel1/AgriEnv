@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="AgriEnv">
+  <rect width="512" height="512" fill="#155c35"/>
+  <circle cx="432" cy="432" r="132" fill="#b8d767" opacity=".92"/>
+  <path d="M256 381V239" fill="none" stroke="#fff" stroke-width="34" stroke-linecap="round"/>
+  <path d="M253 262c-4-82 47-132 139-131 2 86-50 133-139 131Z" fill="#fff"/>
+  <path d="M258 305c3-69-42-111-120-111-1 72 43 113 120 111Z" fill="#dff0bd"/>
+</svg>

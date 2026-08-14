@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import AppNotifications from "@/frontend/components/ui/AppNotifications";
+import PWAProvider from "@/frontend/components/pwa/PWAProvider";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   icons: {
     icon: "/icons/agrienv-mark.svg",
+    apple: "/icons/apple-touch-icon.png",
   },
   appleWebApp: {
     capable: true,
@@ -48,6 +50,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
         <AppNotifications />
+        <PWAProvider />
       </body>
     </html>
   );

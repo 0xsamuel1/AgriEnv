@@ -1,18 +1,53 @@
 {
-  "name": "AgriEnv - Engineering Study Platform",
+  "id": "/",
+  "name": "AgriEnv — Engineering Study Platform",
   "short_name": "AgriEnv",
   "description": "Interactive simulations, AI-powered practice, and quiz battles for Agricultural & Environmental Engineering students",
   "start_url": "/",
+  "scope": "/",
+  "lang": "en",
+  "dir": "ltr",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "background_color": "#f5f7f2",
   "theme_color": "#173d28",
   "orientation": "portrait-primary",
+  "categories": ["education", "productivity", "utilities"],
+  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/icons/agrienv-mark.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "/icons/agrienv-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/agrienv-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/agrienv-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Engineering simulations",
+      "short_name": "Simulations",
+      "description": "Open the AgriEnv engineering simulation laboratory",
+      "url": "/simulate",
+      "icons": [{ "src": "/icons/agrienv-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "AI practice mode",
+      "short_name": "Practice",
+      "description": "Generate a focused Agricultural Engineering practice session",
+      "url": "/questions/practice",
+      "icons": [{ "src": "/icons/agrienv-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }
