@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AgriSim
 
-## Getting Started
+AgriSim is an interactive study workspace for Agricultural and Environmental Engineering students. It combines engineering simulations, AI-assisted revision, real-time quiz battles, voice study, and project-idea development in a responsive green-and-white interface.
 
-First, run the development server:
+## Features
+
+- Hydrology, irrigation, drainage, and erosion simulations
+- AI-generated practice questions and past-paper analysis
+- Live group quiz rooms with scoring and leaderboards
+- Voice-led study sessions with AI feedback
+- Context-aware final-year project ideas
+- Email/password and Google Identity Services authentication through Supabase
+- Responsive, installable PWA interface
+
+## Local development
+
+Requirements: Node.js 20+ and a Supabase project.
 
 ```bash
+npm install
+cp .env.local.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Configure these variables in `.env.local`:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=
+OPENAI_API_KEY=
+```
 
-## Learn More
+Run [`supabase-schema.sql`](./supabase-schema.sql) in the Supabase SQL editor before using profiles, question storage, or Showdown rooms. Enable the Google provider in Supabase and add your local and production origins to the matching Google Web OAuth client.
 
-To learn more about Next.js, take a look at the following resources:
+## Quality checks
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment
 
-## Deploy on Vercel
+The project is ready for Vercel. Add all four environment variables to the Vercel project, deploy, and then add the production URL to:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Supabase Authentication → URL Configuration
+- Google OAuth client → Authorized JavaScript origins
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Never commit `.env.local` or a Supabase service-role key.
