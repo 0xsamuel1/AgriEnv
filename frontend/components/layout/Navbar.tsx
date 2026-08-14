@@ -146,7 +146,7 @@ export default function Navbar() {
             ) : (
               <div className="flex h-full flex-col justify-between py-2">
                 <div>
-                  <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#89958d]">Welcome to AgriSim</p>
+                  <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#89958d]">Welcome to AgriEnv</p>
                   <p className="px-2 text-sm leading-6 text-[#66736a]">Your intelligent study workspace for agricultural and environmental engineering.</p>
                 </div>
                 <div className="space-y-3">

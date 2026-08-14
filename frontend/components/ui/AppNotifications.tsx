@@ -7,7 +7,7 @@ import { Toaster } from "./sonner";
 const notices: Record<string, { title: string; description?: string }> = {
   signed_out: {
     title: "You’re signed out",
-    description: "Your AgriSim session ended securely.",
+    description: "Your AgriEnv session ended securely.",
   },
 };
 
@@ -19,7 +19,7 @@ export default function AppNotifications() {
     const error = url.searchParams.get("error");
 
     if (auth === "success") {
-      toast.success("Welcome to AgriSim", {
+      toast.success("Welcome to AgriEnv", {
         description: "You’re signed in and your workspace is ready.",
       });
     } else if (error === "auth_failed") {

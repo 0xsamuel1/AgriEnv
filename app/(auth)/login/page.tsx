@@ -34,7 +34,7 @@ function LoginForm() {
       setLoading(false);
     } else {
       toast.success("Welcome back", {
-        description: "Opening your AgriSim workspace…",
+        description: "Opening your AgriEnv workspace…",
       });
       router.push(redirect);
       router.refresh();

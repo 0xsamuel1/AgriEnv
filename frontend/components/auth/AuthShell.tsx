@@ -13,7 +13,7 @@ export default function AuthShell({ title, subtitle, eyebrow, children }: AuthSh
   return (
     <main className="grid min-h-screen bg-[#f5f7f2] lg:grid-cols-[1.05fr_.95fr]">
       <aside className="relative hidden min-h-screen overflow-hidden lg:block">
-        <Image src="/images/agrisim-hero.png" alt="Modern irrigated agricultural research fields" fill priority sizes="55vw" className="object-cover" />
+        <Image src="/images/agrienv-hero.png" alt="Modern irrigated agricultural research fields" fill priority sizes="55vw" className="object-cover" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(13,50,28,.28),rgba(13,50,28,.92))]" />
         <div className="absolute inset-0 flex flex-col justify-between p-10 xl:p-14">
           <Brand inverted />
@@ -36,7 +36,7 @@ export default function AuthShell({ title, subtitle, eyebrow, children }: AuthSh
             <p className="mt-3 text-sm leading-6 text-[#6f7c73]">{subtitle}</p>
           </div>
           {children}
-          <p className="mt-7 text-center text-[11px] leading-5 text-[#8a968e]">By continuing, you agree to use AgriSim responsibly as an academic learning tool.</p>
+          <p className="mt-7 text-center text-[11px] leading-5 text-[#8a968e]">By continuing, you agree to use AgriEnv responsibly as an academic learning tool.</p>
         </div>
       </section>
     </main>

@@ -1,4 +1,4 @@
--- AgriSim Database Schema
+-- AgriEnv Database Schema
 -- Run this in your Supabase SQL editor
 
 -- Profiles table (extends auth.users)

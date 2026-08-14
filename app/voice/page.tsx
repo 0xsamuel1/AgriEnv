@@ -188,7 +188,7 @@ export default function VoiceStudyPage() {
             <section className="card">
               <span className="page-kicker">Session setup</span>
               <h2 className="text-xl font-bold tracking-tight">What should we revise?</h2>
-              <p className="mt-2 text-sm leading-6 text-[var(--muted-foreground)]">Choose a course area. AgriSim will read a question aloud and start listening when it is your turn.</p>
+              <p className="mt-2 text-sm leading-6 text-[var(--muted-foreground)]">Choose a course area. AgriEnv will read a question aloud and start listening when it is your turn.</p>
               <label className="mt-6 block text-xs font-bold uppercase tracking-wider text-[#66756b]">Study topic</label>
               <select value={topic} onChange={(e) => setTopic(e.target.value)} className="input-field mt-2">
                 {TOPICS.map((t) => <option key={t} value={t}>{t}</option>)}

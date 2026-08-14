@@ -29,7 +29,7 @@ export default function Home() {
       <main>
         <section className="relative bg-[#123d25] text-white">
           <div className="absolute inset-0 lg:left-[48%]">
-            <Image src="/images/agrisim-hero.png" alt="Modern irrigated agricultural research fields at sunrise" fill priority sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover object-center" />
+            <Image src="/images/agrienv-hero.png" alt="Modern irrigated agricultural research fields at sunrise" fill priority sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover object-center" />
           </div>
           <div className="absolute inset-0 bg-[linear-gradient(90deg,#123d25_0%,rgba(18,61,37,.97)_35%,rgba(18,61,37,.72)_61%,rgba(18,61,37,.15)_100%)] lg:block" />
           <div className="absolute inset-0 bg-[#123d25]/70 lg:hidden" />
@@ -144,7 +144,7 @@ export default function Home() {
             <div>
               <p className="page-kicker"><BarChart3 className="h-4 w-4" /> A better study loop</p>
               <h2 className="text-3xl font-bold tracking-[-0.04em] text-[#15301f] sm:text-4xl">See it. Test it. Explain it.</h2>
-              <p className="mt-4 text-sm leading-7 text-[#69756d]">AgriSim connects visual understanding with active recall and peer learning, so equations become engineering judgement.</p>
+              <p className="mt-4 text-sm leading-7 text-[#69756d]">AgriEnv connects visual understanding with active recall and peer learning, so equations become engineering judgement.</p>
               <Link href="/signup" className="btn-primary mt-7">Build your workspace <ArrowRight className="h-4 w-4" /></Link>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">

@@ -1,6 +1,6 @@
 {
-  "name": "AgriSim - Engineering Study Platform",
-  "short_name": "AgriSim",
+  "name": "AgriEnv - Engineering Study Platform",
+  "short_name": "AgriEnv",
   "description": "Interactive simulations, AI-powered practice, and quiz battles for Agricultural & Environmental Engineering students",
   "start_url": "/",
   "display": "standalone",
@@ -9,7 +9,7 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icons/agrisim-mark.svg",
+      "src": "/icons/agrienv-mark.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

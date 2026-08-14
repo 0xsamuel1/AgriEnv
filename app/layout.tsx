@@ -16,19 +16,19 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: {
-    default: "AgriSim — Agricultural Engineering, Brought to Life",
-    template: "%s · AgriSim",
+    default: "AgriEnv — Agricultural Engineering, Brought to Life",
+    template: "%s · AgriEnv",
   },
   description:
     "Interactive simulations, AI-powered past question analysis, real-time quiz battles, and more for Agricultural & Environmental Engineering students.",
   manifest: "/manifest.json",
   icons: {
-    icon: "/icons/agrisim-mark.svg",
+    icon: "/icons/agrienv-mark.svg",
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "AgriSim",
+    title: "AgriEnv",
   },
 };
 

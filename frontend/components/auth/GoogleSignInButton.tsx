@@ -121,7 +121,7 @@ export default function GoogleSignInButton({
           );
         }
 
-        toast.success(mode === "signup" ? "Welcome to AgriSim" : "Welcome back", {
+        toast.success(mode === "signup" ? "Welcome to AgriEnv" : "Welcome back", {
           description: "You’re signed in and your workspace is ready.",
         });
         router.push(redirectTo);

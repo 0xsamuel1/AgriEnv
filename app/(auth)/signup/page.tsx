@@ -48,7 +48,7 @@ export default function SignupPage() {
         total_score: 0,
       });
       if (data.session) {
-        toast.success("Welcome to AgriSim", {
+        toast.success("Welcome to AgriEnv", {
           description: "Your student workspace is ready.",
         });
         router.push("/");
@@ -64,7 +64,7 @@ export default function SignupPage() {
   };
 
   return (
-    <AuthShell eyebrow="Create your account" title="Start learning with AgriSim" subtitle="Join your coursemates in a purpose-built Agricultural Engineering study workspace.">
+    <AuthShell eyebrow="Create your account" title="Start learning with AgriEnv" subtitle="Join your coursemates in a purpose-built Agricultural Engineering study workspace.">
         <div className="space-y-5 rounded-[1.4rem] border border-[#dce5dd] bg-white p-5 shadow-[0_18px_50px_rgba(28,59,36,.07)] sm:p-7">
           <GoogleSignInButton mode="signup" onError={setError} />
 

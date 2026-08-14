@@ -1,6 +1,6 @@
-# AgriSim
+# AgriEnv
 
-AgriSim is an interactive study workspace for Agricultural and Environmental Engineering students. It combines engineering simulations, AI-assisted revision, real-time quiz battles, voice study, and project-idea development in a responsive green-and-white interface.
+AgriEnv is an interactive study workspace for Agricultural and Environmental Engineering students. It combines engineering simulations, AI-assisted revision, real-time quiz battles, voice study, and project-idea development in a responsive green-and-white interface.
 
 ## Features
 

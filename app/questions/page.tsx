@@ -6,7 +6,7 @@ import Navbar from "@/frontend/components/layout/Navbar";
 import PageHeader from "@/frontend/components/layout/PageHeader";
 
 const paths = [
-  { href: "/questions/upload", icon: Upload, eyebrow: "Start with your material", title: "Upload & analyse", description: "Paste past questions and let AgriSim identify the topics, formulas, difficulty patterns, and likely areas of focus.", points: ["Topic distribution", "Difficulty mapping", "Hot-topic prediction"], cta: "Analyse questions", number: "01" },
+  { href: "/questions/upload", icon: Upload, eyebrow: "Start with your material", title: "Upload & analyse", description: "Paste past questions and let AgriEnv identify the topics, formulas, difficulty patterns, and likely areas of focus.", points: ["Topic distribution", "Difficulty mapping", "Hot-topic prediction"], cta: "Analyse questions", number: "01" },
   { href: "/questions/practice", icon: Brain, eyebrow: "Turn insight into recall", title: "AI practice mode", description: "Build a fresh practice set around your chosen course area and reveal clear explanations when you need them.", points: ["Difficulty control", "Instant feedback", "Step-by-step solutions"], cta: "Start practice", number: "02" },
 ];
 
