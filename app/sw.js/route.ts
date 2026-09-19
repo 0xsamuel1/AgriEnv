@@ -22,7 +22,12 @@ const APP_SHELL = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(SHELL_CACHE).then((cache) => cache.addAll(APP_SHELL)));
+  event.waitUntil(
+    caches
+      .open(SHELL_CACHE)
+      .then((cache) => cache.addAll(APP_SHELL))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener("activate", (event) => {
@@ -45,13 +50,14 @@ self.addEventListener("message", (event) => {
 });
 
 async function fetchNavigation(request) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 6000);
   const url = new URL(request.url);
   const cacheKey = new Request(url.origin + url.pathname);
 
   try {
-    const response = await fetch(request, { signal: controller.signal });
+    // Let the browser decide when a navigation has genuinely failed. Aborting
+    // after a fixed delay can show the offline page on a healthy but slow
+    // connection (for example, while a serverless auth page is warming up).
+    const response = await fetch(request);
 
     if (response.ok) {
       const copy = response.clone();
@@ -65,8 +71,6 @@ async function fetchNavigation(request) {
 
     const offlineResponse = await caches.match(OFFLINE_PAGE);
     return offlineResponse || Response.error();
-  } finally {
-    clearTimeout(timeout);
   }
 }
 
