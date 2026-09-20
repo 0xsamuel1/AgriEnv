@@ -9,12 +9,12 @@ export function GET() {
   const script = String.raw`
 const DEPLOYMENT_VERSION = ${JSON.stringify(deploymentVersion)};
 const CACHE_PREFIX = "agrienv";
-const SHELL_CACHE = CACHE_PREFIX + "-shell-" + DEPLOYMENT_VERSION;
-const RUNTIME_CACHE = CACHE_PREFIX + "-runtime-" + DEPLOYMENT_VERSION;
-const OFFLINE_PAGE = "/offline.html";
+// A separate namespace also removes HTML cached by older workers, including
+// authenticated pages and redirects. Only static assets belong in this cache.
+const SHELL_CACHE = CACHE_PREFIX + "-assets-shell-v2-" + DEPLOYMENT_VERSION;
+const RUNTIME_CACHE = CACHE_PREFIX + "-assets-runtime-v2-" + DEPLOYMENT_VERSION;
 
 const APP_SHELL = [
-  OFFLINE_PAGE,
   "/manifest.json",
   "/icons/agrienv-192.png",
   "/icons/agrienv-512.png",
@@ -49,43 +49,16 @@ self.addEventListener("message", (event) => {
   if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
 });
 
-async function fetchNavigation(request) {
-  const url = new URL(request.url);
-  const cacheKey = new Request(url.origin + url.pathname);
-
-  try {
-    // Let the browser decide when a navigation has genuinely failed. Aborting
-    // after a fixed delay can show the offline page on a healthy but slow
-    // connection (for example, while a serverless auth page is warming up).
-    const response = await fetch(request);
-
-    if (response.ok) {
-      const copy = response.clone();
-      void caches.open(RUNTIME_CACHE).then((cache) => cache.put(cacheKey, copy));
-    }
-
-    return response;
-  } catch {
-    const cachedPage = await caches.match(cacheKey);
-    if (cachedPage) return cachedPage;
-
-    const offlineResponse = await caches.match(OFFLINE_PAGE);
-    return offlineResponse || Response.error();
-  }
-}
-
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
+  // Auth redirects and document requests must use normal browser networking.
+  // Never replace an application page with cached HTML or an offline document.
+  if (request.mode === "navigate") return;
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/auth/")) return;
-
-  if (request.mode === "navigate") {
-    event.respondWith(fetchNavigation(request));
-    return;
-  }
 
   const cacheableAsset =
     url.pathname.startsWith("/_next/static/") ||
