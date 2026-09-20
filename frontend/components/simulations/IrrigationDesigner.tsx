@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Plus, Trash2, Info } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
+import { ControlPanel, ControlSection, Insight, Metric, RangeControl, Visualization } from "./SimulationWorkbench";
 import {
   Sprinkler,
   IrrigationParams,
@@ -11,6 +12,7 @@ import {
 
 export default function IrrigationDesigner() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const draggedRef = useRef(false);
   const [sprinklers, setSprinklers] = useState<Sprinkler[]>([
     createDefaultSprinkler(25, 25),
     createDefaultSprinkler(75, 25),
@@ -39,7 +41,7 @@ export default function IrrigationDesigner() {
     ctx.clearRect(0, 0, w, h);
 
     // Field background
-    ctx.fillStyle = "#2d5a1e";
+    ctx.fillStyle = "#234e37";
     ctx.fillRect(0, 0, w, h);
 
     // Water distribution heatmap
@@ -53,9 +55,7 @@ export default function IrrigationDesigner() {
       for (let j = 0; j < gridSize; j++) {
         const val = grid[i][j] / maxVal;
         if (val > 0) {
-          const blue = Math.floor(100 + val * 155);
-          const alpha = 0.2 + val * 0.6;
-          ctx.fillStyle = `rgba(30, ${Math.floor(80 + val * 80)}, ${blue}, ${alpha})`;
+          ctx.fillStyle = `rgba(135, 220, 221, ${0.1 + val * 0.65})`;
           ctx.fillRect(i * cellW, j * cellH, cellW + 1, cellH + 1);
         }
       }
@@ -79,14 +79,16 @@ export default function IrrigationDesigner() {
     for (const s of sprinklers) {
       const sx = (s.x / 100) * w;
       const sy = (s.y / 100) * h;
-      const sr = (s.radius * Math.sqrt(params.pressure / 200) / Math.max(params.fieldWidth, params.fieldHeight)) * w;
+      const sr = (s.radius * Math.sqrt(params.pressure / 200) / params.fieldWidth) * w;
 
       // Spray radius circle
       ctx.beginPath();
       ctx.arc(sx, sy, sr, 0, Math.PI * 2);
-      ctx.strokeStyle = "rgba(100, 200, 255, 0.5)";
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(181, 232, 210, 0.6)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
       ctx.stroke();
+      ctx.setLineDash([]);
 
       // Sprinkler dot
       ctx.beginPath();
@@ -95,8 +97,12 @@ export default function IrrigationDesigner() {
       ctx.fill();
       ctx.beginPath();
       ctx.arc(sx, sy, 4, 0, Math.PI * 2);
-      ctx.fillStyle = "#3b82f6";
+      ctx.fillStyle = "#729d50";
       ctx.fill();
+      ctx.fillStyle = "#edf5dc";
+      ctx.font = "10px monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(String(sprinklers.indexOf(s) + 1).padStart(2, "0"), sx, sy - 13);
     }
   }, [sprinklers, params, result]);
 
@@ -105,17 +111,21 @@ export default function IrrigationDesigner() {
     if (!canvas) return;
     const resizeCanvas = () => {
       const rect = canvas.parentElement!.getBoundingClientRect();
-      const size = Math.min(rect.width, 500);
+      const size = Math.min(rect.width, 420 * params.fieldWidth / params.fieldHeight);
       canvas.width = size;
-      canvas.height = size;
+      canvas.height = size * params.fieldHeight / params.fieldWidth;
+      drawField();
     };
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
-    drawField();
     return () => window.removeEventListener("resize", resizeCanvas);
-  }, [drawField]);
+  }, [drawField, params.fieldWidth, params.fieldHeight]);
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (draggedRef.current) {
+      draggedRef.current = false;
+      return;
+    }
     if (dragging) return;
     const canvas = canvasRef.current!;
     const rect = canvas.getBoundingClientRect();
@@ -126,6 +136,7 @@ export default function IrrigationDesigner() {
   };
 
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    draggedRef.current = false;
     const canvas = canvasRef.current!;
     const rect = canvas.getBoundingClientRect();
     const mx = ((e.clientX - rect.left) / rect.width) * 100;
@@ -133,6 +144,7 @@ export default function IrrigationDesigner() {
 
     const hit = sprinklers.find((s) => Math.hypot(s.x - mx, s.y - my) < 5);
     if (hit) {
+      draggedRef.current = true;
       e.preventDefault();
       e.currentTarget.setPointerCapture(e.pointerId);
       setDragging(hit.id);
@@ -156,113 +168,32 @@ export default function IrrigationDesigner() {
   const cuColor = result.uniformityCoefficient >= 85 ? "#22c55e" : result.uniformityCoefficient >= 70 ? "#eab308" : "#ef4444";
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-5">
-      <div className="lg:col-span-3">
-        <div className="card p-4">
-          <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-sm text-[var(--muted-foreground)]">Tap to place sprinklers. Drag to move.</span>
-            <button
-              onClick={() => setSprinklers([])}
-              className="text-xs text-[var(--destructive)] hover:underline flex items-center gap-1"
-            >
-              <Trash2 className="w-3 h-3" /> Clear All
-            </button>
+    <div className="sim-layout">
+      <ControlPanel onReset={() => { setSprinklers([createDefaultSprinkler(25, 25), createDefaultSprinkler(75, 25), createDefaultSprinkler(25, 75), createDefaultSprinkler(75, 75)]); setParams({ fieldWidth: 100, fieldHeight: 100, sprinklers: [], pressure: 200, applicationRate: 10 }); }}>
+        <ControlSection number="01" title="Field & pressure">
+          <RangeControl label="Operating pressure" value={params.pressure} unit="kPa" min={50} max={500} step={10} onChange={pressure => setParams(p => ({ ...p, pressure }))} />
+          <RangeControl label="Field width" value={params.fieldWidth} unit="m" min={20} max={200} step={10} onChange={fieldWidth => setParams(p => ({ ...p, fieldWidth }))} />
+          <p className="mt-3 text-[10px] text-[#8a947f]">Field length: {params.fieldHeight} m</p>
+        </ControlSection>
+        <ControlSection number="02" title={`Sprinkler network · ${sprinklers.length}`}>
+          <div className="max-h-64 space-y-2 overflow-y-auto">
+            {sprinklers.length === 0 && <p className="rounded-lg border border-dashed border-[#dfe5d7] p-4 text-xs leading-6 text-[#88917e]">Your field is clear. Tap the map or add a sprinkler to start designing.</p>}
+            {sprinklers.map((s, i) => <div key={s.id} className="flex items-center gap-3 rounded-lg border border-[#e9eddf] bg-[#fafbf7] px-3 py-2.5"><span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#e8efe0] font-mono text-[10px] text-[#678247]">{String(i + 1).padStart(2, "0")}</span><div className="flex-1"><p className="text-[11px] text-[#4d6045]">Sprinkler {i + 1}</p><p className="mt-0.5 font-mono text-[9px] text-[#929d88]">X {s.x.toFixed(0)}% · Y {s.y.toFixed(0)}%</p></div><button type="button" aria-label={`Remove sprinkler ${i + 1}`} onClick={() => setSprinklers(prev => prev.filter(sp => sp.id !== s.id))} className="rounded-md p-2 text-[#97a08e] hover:bg-red-50 hover:text-red-600"><Trash2 size={13} /></button></div>)}
           </div>
-          <div className="flex justify-center">
-            <canvas
-              ref={canvasRef}
-              className="max-w-full touch-none rounded-xl cursor-crosshair"
-              onClick={handleCanvasClick}
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={handlePointerUp}
-              onPointerCancel={() => setDragging(null)}
-            />
-          </div>
+          <button type="button" onClick={() => setSprinklers(prev => [...prev, createDefaultSprinkler(50, 50)])} className="mt-3 flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-[#b4c79d] bg-[#f2f6e9] text-xs font-medium text-[#57723d]"><Plus size={14} /> Add sprinkler</button>
+        </ControlSection>
+      </ControlPanel>
+      <div className="min-w-0">
+        <div className="sim-metrics">
+          <Metric primary label="Uniformity · CU" value={result.uniformityCoefficient} unit="%" note="Target: 85% or higher" />
+          <Metric label="Field coverage" value={result.coveragePercent} unit="%" note="Area receiving water" />
+          <Metric label="Total flow" value={result.totalFlowRate} unit="L/min" note={`${sprinklers.length} sprinklers in your network`} />
         </div>
-        <div className="card mt-4 bg-[var(--muted)]">
-          <div className="flex items-center gap-2 mb-2">
-            <Info className="w-4 h-4 text-[var(--primary)]" />
-            <span className="text-sm font-semibold">Uniformity Analysis</span>
-          </div>
-          <p className="text-sm">
-            CU (Christiansen&apos;s) measures how evenly water is distributed. Target: CU &ge; 85% for crops. DU (Distribution Uniformity) focuses on the driest quarter.
-          </p>
-        </div>
-      </div>
-
-      <div className="lg:col-span-2 space-y-4">
-        <div className="card">
-          <h3 className="font-bold mb-3">System Settings</h3>
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Pressure</span>
-                <span className="font-mono font-bold">{params.pressure} kPa</span>
-              </div>
-              <input type="range" min={50} max={500} step={10} value={params.pressure}
-                onChange={e => setParams(p => ({ ...p, pressure: +e.target.value }))}
-                className="w-full accent-[var(--primary)]" />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Field Width</span>
-                <span className="font-mono font-bold">{params.fieldWidth} m</span>
-              </div>
-              <input type="range" min={20} max={200} step={10} value={params.fieldWidth}
-                onChange={e => setParams(p => ({ ...p, fieldWidth: +e.target.value }))}
-                className="w-full accent-[var(--primary)]" />
-            </div>
-          </div>
-        </div>
-
-        <div className="card">
-          <h3 className="font-bold mb-3">Sprinklers ({sprinklers.length})</h3>
-          <div className="space-y-2 max-h-48 overflow-y-auto">
-            {sprinklers.map((s, i) => (
-              <div key={s.id} className="flex items-center gap-2 text-sm bg-[var(--muted)] p-2 rounded-lg">
-                <span className="font-mono w-6">#{i + 1}</span>
-                <span className="flex-1 text-xs text-[var(--muted-foreground)]">
-                  ({s.x.toFixed(0)}%, {s.y.toFixed(0)}%)
-                </span>
-                <button onClick={() => setSprinklers(prev => prev.filter(sp => sp.id !== s.id))}
-                  className="text-[var(--destructive)] hover:bg-[var(--border)] p-1 rounded">
-                  <Trash2 className="w-3 h-3" />
-                </button>
-              </div>
-            ))}
-          </div>
-          <button
-            onClick={() => setSprinklers(prev => [...prev, createDefaultSprinkler(50, 50)])}
-            className="btn-secondary w-full mt-3 text-sm"
-          >
-            <Plus className="w-4 h-4" /> Add Sprinkler
-          </button>
-        </div>
-
-        <div className="card" style={{ borderColor: cuColor, borderWidth: 2 }}>
-          <h3 className="font-bold mb-3">Results</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm">Uniformity (CU)</span>
-              <span className="font-bold font-mono text-lg" style={{ color: cuColor }}>
-                {result.uniformityCoefficient}%
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm">Distribution (DU)</span>
-              <span className="font-bold font-mono">{result.distributionUniformity}%</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm">Coverage</span>
-              <span className="font-bold font-mono">{result.coveragePercent}%</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm">Total Flow</span>
-              <span className="font-bold font-mono">{result.totalFlowRate} L/min</span>
-            </div>
-          </div>
-        </div>
+        <Visualization title="Your irrigation layout" subtitle="Tap to place a sprinkler. Drag to reposition." action={<button type="button" onClick={() => setSprinklers([])} className="flex items-center gap-1.5 rounded-md border border-white/20 px-2.5 py-1.5 text-[10px] text-[#c6d3c1] hover:bg-white/10"><Trash2 size={11} /> Clear field</button>} legend={<span className="flex items-center gap-2">Less water<span className="inline-block h-1.5 w-20 rounded-full bg-gradient-to-r from-[#315b37] via-[#3c918a] to-[#a4dce1]" />More water</span>}>
+          <canvas ref={canvasRef} className="mx-auto touch-none cursor-crosshair" aria-label="Interactive sprinkler layout. Tap to add or drag to move sprinklers." onClick={handleCanvasClick} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={() => { draggedRef.current = false; setDragging(null); }} />
+        </Visualization>
+        <dl className="sim-detail-grid"><div><dt>Distribution uniformity</dt><dd>{result.distributionUniformity}% DU</dd></div><div><dt>Field dimensions</dt><dd>{params.fieldWidth} × {params.fieldHeight} m</dd></div><div><dt>CU assessment</dt><dd><span style={{ color: cuColor }}>●</span> {result.uniformityCoefficient >= 85 ? "On target" : "Needs adjustment"}</dd></div></dl>
+        <Insight title="Good coverage starts with good placement">Overlap the spray areas to distribute water more evenly. CU measures overall uniformity; DU focuses on the driest quarter of the field.</Insight>
       </div>
     </div>
   );

@@ -129,6 +129,52 @@ input[type="range"] { height: 6px; border-radius: 999px; cursor: pointer; }
 .animate-fade-up { animation: fade-up 0.65s cubic-bezier(.22,.8,.3,1) both; }
 .animate-pulse-soft { animation: pulse-soft 2.2s ease-in-out infinite; }
 
+/* The simulation studio shares a quiet, instrument-like visual language. */
+.sim-page { background: #f5f6f0; }
+.sim-hero { position: relative; overflow: hidden; border-radius: 20px; padding: 30px; background: linear-gradient(115deg, #183f2e, #123526 68%, #214e36); }
+.sim-hero-contours { position: absolute; inset: -100% -35% -100% 35%; transform: rotate(-24deg); opacity: .22; background: repeating-radial-gradient(ellipse at 65% 55%, transparent 0 35px, #8fac79 36px, transparent 37px 62px); mask-image: linear-gradient(90deg, transparent, black); }
+.sim-hero-icon { display: grid; place-items: center; width: 43px; height: 43px; border-radius: 13px; color: #d7edac; border: 1px solid #ffffff26; background: #ffffff08; }
+.sim-tool-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 5px; margin: 22px 0; border: 1px solid #dfe5da; border-radius: 13px; background: #ecefe7; }
+.sim-tool-tab { display: flex; align-items: center; justify-content: center; gap: 9px; padding: 12px 16px; border-radius: 9px; font-size: 12px; font-weight: 500; color: #788173; transition: background .2s, color .2s; }
+.sim-tool-tab:hover { color: #244c31; background: #f8faf4; }
+.sim-tool-tab.is-active { color: #244c31; background: white; box-shadow: 0 2px 5px #1930230a; }
+.sim-layout { display: grid; grid-template-columns: 330px minmax(0, 1fr); align-items: start; gap: 24px; }
+.sim-controls { overflow: hidden; border: 1px solid #dfe5da; border-radius: 16px; background: white; }
+.sim-panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 18px 20px; border-bottom: 1px solid #edf0e8; color: #344a3c; }
+.sim-reset { display: flex; align-items: center; gap: 5px; padding: 6px; border-radius: 6px; color: #7c8679; font-size: 10px; }
+.sim-reset:hover { background: #f0f4e9; color: #245632; }
+.sim-control-section + .sim-control-section { margin-top: 24px; padding-top: 22px; border-top: 1px solid #edf0e8; }
+.sim-step { display: grid; place-items: center; width: 23px; height: 23px; border: 1px solid #e5e9de; border-radius: 7px; font-family: var(--font-geist-mono), monospace; font-size: 9px; font-weight: 400; color: #859074; }
+.sim-choice { display: flex; align-items: center; width: 100%; gap: 9px; padding: 11px 12px; margin-top: 6px; border: 1px solid #e7ebdf; border-radius: 9px; font-size: 11px; color: #6b7769; transition: all .15s; }
+.sim-choice:hover { background: #f7f9f1; border-color: #bbd0aa; }
+.sim-choice.is-selected { background: #edf4e2; border-color: #a5bf85; color: #37572b; }
+.sim-range + .sim-range { margin-top: 21px; }
+.sim-range-value { display: inline-flex; align-items: baseline; gap: 4px; border: 1px solid #e6eade; border-radius: 6px; background: #f9faf5; padding: 4px 7px; font-family: var(--font-geist-mono), monospace; font-size: 11px; color: #33532e; }
+.sim-range-value span { font-family: var(--font-geist-sans), sans-serif; font-size: 9px; color: #87917f; }
+.sim-range input[type=range] { appearance: none; display: block; width: 100%; height: 5px; margin: 8px 0 12px; background: linear-gradient(to right, #7e9e59 var(--range-progress), #e9eddf var(--range-progress)); }
+.sim-range input::-webkit-slider-thumb { appearance: none; width: 15px; height: 15px; border: 3px solid white; border-radius: 50%; background: #557b3d; box-shadow: 0 0 0 1px #9bb684, 0 2px 4px #20342220; }
+.sim-range input::-moz-range-thumb { width: 10px; height: 10px; border: 3px solid white; border-radius: 50%; background: #557b3d; box-shadow: 0 0 0 1px #9bb684; }
+.sim-page :is(button, a, input, select):focus-visible { outline: 2px solid #79a653; outline-offset: 4px; }
+.sim-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+.sim-metric { min-width: 0; padding: 20px; border: 1px solid #dfe5da; border-radius: 14px; background: #fff; color: #29402c; }
+.sim-metric.is-primary { background: #e9efd9; border-color: #d3dfb8; }
+.sim-metric-label { font-size: 10px; font-weight: 500; }
+.sim-metric-number { font-size: clamp(23px, 2.8vw, 34px); line-height: 1; letter-spacing: -.05em; font-weight: 500; font-variant-numeric: tabular-nums; }
+.sim-visual { overflow: hidden; border: 1px solid #284e39; border-radius: 16px; background: #173c2b; }
+.sim-canvas-wrap { position: relative; overflow: hidden; margin: 0 12px; border: 1px solid #ffffff12; border-radius: 9px; background: #204631; }
+.sim-canvas-wrap canvas { display: block; max-width: 100%; }
+.sim-live { border: 1px solid #ffffff20; border-radius: 5px; padding: 5px 7px; font-family: var(--font-geist-mono), monospace; font-size: 8px; letter-spacing: .12em; color: #b4ce9e; }
+.sim-formula { margin-top: 16px; border: 1px solid #dfe5d6; border-radius: 12px; padding: 17px 20px; background: #f0f3e9; }
+.sim-insight { display: flex; gap: 12px; padding: 20px 2px; }
+.sim-select-label { display: block; margin-bottom: 7px; font-size: 11px; color: #788172; }
+.sim-select { width: 100%; min-height: 42px; padding: 9px; border: 1px solid #dfe5d7; border-radius: 8px; font-size: 11px; background: #f9faf6; color: #43523c; }
+.sim-detail-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 18px 0; border-bottom: 1px solid #dfe5d7; }
+.sim-detail-grid dt { font-size: 10px; color: #84907e; }
+.sim-detail-grid dd { margin-top: 5px; font-size: 13px; font-weight: 500; color: #3c5236; }
+@media (min-width: 1024px) { .sim-hero { padding: 34px 40px; } }
+@media (max-width: 1023px) { .sim-layout { grid-template-columns: 290px minmax(0, 1fr); gap: 16px; } .sim-metric { padding: 14px; } }
+@media (max-width: 767px) { .sim-layout { display: flex; flex-direction: column-reverse; } .sim-layout > * { width: 100%; min-width: 0; } .sim-hero { padding: 24px; } .sim-tool-tab { padding: 11px 5px; font-size: 10px; gap: 5px; } .sim-tool-tab svg { width: 13px; } .sim-metric { padding: 12px; } .sim-metric-number { font-size: 23px; } }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

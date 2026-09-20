@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Info } from "lucide-react";
+import { Choice, ControlPanel, ControlSection, Formula, Insight, Metric, RangeControl, Visualization } from "./SimulationWorkbench";
 import {
   RunoffParams,
   LAND_USE_COEFFICIENTS,
@@ -33,13 +33,15 @@ export default function RunoffSimulator() {
 
     // Sky gradient
     const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.4);
-    skyGrad.addColorStop(0, `rgba(100, 150, 200, ${0.3 + data.intensity * 0.5})`);
-    skyGrad.addColorStop(1, `rgba(180, 210, 240, ${0.2 + data.intensity * 0.3})`);
+    skyGrad.addColorStop(0, "#234c3b");
+    skyGrad.addColorStop(1, "#456b54");
     ctx.fillStyle = skyGrad;
-    ctx.fillRect(0, 0, w, h * 0.4);
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = "#d0dfb620";
+    for (let x = 18; x < w; x += 24) for (let y = 18; y < h; y += 24) ctx.fillRect(x, y, 1, 1);
 
     // Rain drops
-    ctx.strokeStyle = `rgba(100, 150, 255, ${0.3 + data.intensity * 0.5})`;
+    ctx.strokeStyle = `rgba(166, 212, 214, ${0.3 + data.intensity * 0.5})`;
     ctx.lineWidth = 1.5;
     for (let i = 0; i < data.rainDrops; i++) {
       const x = ((i * 37 + time * 100) % w);
@@ -51,7 +53,7 @@ export default function RunoffSimulator() {
     }
 
     // Ground / Hillside
-    const landColor = LAND_USE_COEFFICIENTS[selectedLandUse].color;
+    const landColor = ({ forest: "#4e7043", grassland: "#839761", cropland: "#9a9a65", suburban: "#8d8b72", urban: "#7a8c85" } as Record<string, string>)[selectedLandUse];
     ctx.fillStyle = landColor;
     ctx.beginPath();
     ctx.moveTo(0, h * 0.45);
@@ -62,10 +64,23 @@ export default function RunoffSimulator() {
     ctx.closePath();
     ctx.fill();
 
+    // Contour lines give the catchment a readable layered terrain profile.
+    ctx.save();
+    ctx.clip();
+    ctx.strokeStyle = "#d5d6ad35";
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 10; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, h * .48 + i * 19);
+      ctx.bezierCurveTo(w * .25, h * .32 + i * 19, w * .6, h * .68 + i * 19, w, h * .5 + i * 19);
+      ctx.stroke();
+    }
+    ctx.restore();
+
     // Surface runoff streams
     const streamLevel = data.waterLevel;
     if (streamLevel > 0) {
-      ctx.fillStyle = `rgba(30, 100, 200, ${0.3 + streamLevel * 0.4})`;
+      ctx.fillStyle = `rgba(117, 192, 199, ${0.5 + streamLevel * 0.4})`;
       ctx.beginPath();
       ctx.moveTo(w * 0.5, h * 0.5);
       for (let x = w * 0.5; x <= w; x += 5) {
@@ -81,7 +96,7 @@ export default function RunoffSimulator() {
 
       // Collection point / outlet
       const outletSize = 20 + streamLevel * 40;
-      ctx.fillStyle = `rgba(30, 80, 180, ${0.4 + streamLevel * 0.4})`;
+      ctx.fillStyle = `rgba(53, 131, 142, ${0.6 + streamLevel * 0.4})`;
       ctx.beginPath();
       ctx.ellipse(w * 0.85, h * 0.75, outletSize, outletSize * 0.5, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -89,16 +104,21 @@ export default function RunoffSimulator() {
 
     // Vegetation dots based on land use
     const vegDensity = 1 - params.runoffCoefficient;
-    ctx.fillStyle = "#22c55e";
+    ctx.fillStyle = "#c0d49a";
     for (let i = 0; i < vegDensity * 60; i++) {
       const vx = (i * 47) % w;
       const vy = h * 0.4 + ((i * 71) % (h * 0.4));
       ctx.beginPath();
-      ctx.arc(vx, vy, 2 + Math.random() * 3, 0, Math.PI * 2);
+      ctx.arc(vx, vy, 2 + (i % 3), 0, Math.PI * 2);
       ctx.fill();
     }
 
-    animationRef.current = requestAnimationFrame(drawSimulation);
+    ctx.font = "9px monospace";
+    ctx.fillStyle = "#d4e6c1";
+    ctx.fillText("CATCHMENT PROFILE", 15, 22);
+    ctx.fillText(`${params.rainfallIntensity} mm/hr`, 15, 39);
+    ctx.fillText("OUTLET →", w * .75, h * .91);
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) animationRef.current = requestAnimationFrame(drawSimulation);
   }, [params, selectedLandUse]);
 
   useEffect(() => {
@@ -108,10 +128,11 @@ export default function RunoffSimulator() {
       const rect = canvas.parentElement!.getBoundingClientRect();
       canvas.width = rect.width;
       canvas.height = Math.min(rect.width * 0.6, 400);
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = requestAnimationFrame(drawSimulation);
     };
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
-    animationRef.current = requestAnimationFrame(drawSimulation);
     return () => {
       window.removeEventListener("resize", resizeCanvas);
       cancelAnimationFrame(animationRef.current);
@@ -121,99 +142,28 @@ export default function RunoffSimulator() {
   const result = calculateRunoff(params);
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-5">
-      <div className="lg:col-span-3">
-        <div className="card p-0 overflow-hidden">
-          <canvas ref={canvasRef} className="w-full" />
+    <div className="sim-layout">
+      <ControlPanel onReset={() => { setSelectedLandUse("cropland"); setParams({ runoffCoefficient: 0.4, rainfallIntensity: 50, catchmentArea: 100 }); }}>
+        <ControlSection number="01" title="Catchment surface">
+          {Object.entries(LAND_USE_COEFFICIENTS).map(([key, val]) => <Choice key={key} selected={selectedLandUse === key} onClick={() => { setSelectedLandUse(key); setParams(p => ({ ...p, runoffCoefficient: val.C })); }} label={val.label} detail={`C ${val.C.toFixed(2)}`} color={val.color} />)}
+        </ControlSection>
+        <ControlSection number="02" title="Rainfall & catchment">
+          <RangeControl label="Rainfall intensity" value={params.rainfallIntensity} unit="mm/hr" min={5} max={200} step={5} onChange={rainfallIntensity => setParams(p => ({ ...p, rainfallIntensity }))} />
+          <RangeControl label="Catchment area" value={params.catchmentArea} unit="ha" min={10} max={500} step={10} onChange={catchmentArea => setParams(p => ({ ...p, catchmentArea }))} />
+        </ControlSection>
+        <div className="mt-6 rounded-lg bg-[#f5f7ef] p-3 text-[10px] leading-5 text-[#839077]">Select a surface, then adjust the rainfall to explore your catchment’s response.</div>
+      </ControlPanel>
+      <div className="min-w-0">
+        <div className="sim-metrics">
+          <Metric primary label="Peak discharge" value={result.peakDischarge} unit="m³/s" note="Water leaving the catchment" />
+          <Metric label="Runoff volume" value={result.totalVolume} unit="m³" note="For a one-hour storm" />
+          <Metric label="Runoff coefficient" value={params.runoffCoefficient.toFixed(2)} note={LAND_USE_COEFFICIENTS[selectedLandUse].label} />
         </div>
-
-        <div className="card mt-4 bg-[#eef4ed]">
-          <div className="flex items-center gap-2 mb-2">
-            <Info className="w-4 h-4 text-[var(--primary)]" />
-            <span className="text-sm font-semibold">Live Formula</span>
-          </div>
-          <code className="text-sm font-mono text-[var(--foreground)] break-all">
-            {result.formulaDisplay}
-          </code>
-        </div>
-      </div>
-
-      <div className="lg:col-span-2 space-y-4">
-        <div className="card">
-          <h3 className="font-bold mb-4">Land Use Type</h3>
-          <div className="grid grid-cols-1 gap-2">
-            {Object.entries(LAND_USE_COEFFICIENTS).map(([key, val]) => (
-              <button
-                key={key}
-                onClick={() => {
-                  setSelectedLandUse(key);
-                  setParams((p) => ({ ...p, runoffCoefficient: val.C }));
-                }}
-                className={`flex items-center gap-3 p-3 rounded-xl text-sm font-medium transition-all text-left ${
-                  selectedLandUse === key
-                    ? "bg-[var(--primary)] text-white"
-                    : "bg-[var(--muted)] hover:bg-[var(--border)]"
-                }`}
-              >
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: val.color }} />
-                <span className="flex-1">{val.label}</span>
-                <span className="text-xs opacity-80">C = {val.C}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="card">
-          <h3 className="font-bold mb-4">Parameters</h3>
-
-          <div className="space-y-5">
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span>Rainfall Intensity (i)</span>
-                <span className="font-mono font-bold">{params.rainfallIntensity} mm/hr</span>
-              </div>
-              <input
-                type="range"
-                min={5}
-                max={200}
-                step={5}
-                value={params.rainfallIntensity}
-                onChange={(e) => setParams((p) => ({ ...p, rainfallIntensity: +e.target.value }))}
-                className="w-full accent-[var(--primary)]"
-              />
-            </div>
-
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span>Catchment Area (A)</span>
-                <span className="font-mono font-bold">{params.catchmentArea} ha</span>
-              </div>
-              <input
-                type="range"
-                min={10}
-                max={500}
-                step={10}
-                value={params.catchmentArea}
-                onChange={(e) => setParams((p) => ({ ...p, catchmentArea: +e.target.value }))}
-                className="w-full accent-[var(--primary)]"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="card border-green-200 bg-[#f1f7ef]">
-          <h3 className="font-bold mb-3">Results</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-sm text-[var(--muted-foreground)]">Peak Discharge (Q)</span>
-              <span className="font-bold font-mono text-[var(--primary)]">{result.peakDischarge} m³/s</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-[var(--muted-foreground)]">Total Volume (1hr storm)</span>
-              <span className="font-bold font-mono">{result.totalVolume} m³</span>
-            </div>
-          </div>
-        </div>
+        <Visualization title="Catchment response" subtitle="Rainfall → surface flow → collection" legend={<span>● Rainfall <span className="mx-3 text-[#9dbe83]">● Land cover</span><span className="text-[#96cbe3]">● Surface runoff</span></span>}>
+          <canvas ref={canvasRef} className="w-full" role="img" aria-label={`Animated catchment showing ${params.rainfallIntensity} millimetres per hour of rainfall and ${result.peakDischarge} cubic metres per second of peak runoff`} />
+        </Visualization>
+        <Formula name="Rational method · Q = CiA / 360">{result.formulaDisplay}</Formula>
+        <Insight title="The surface makes a difference">Compare forest and paved land under the same rainfall. A higher runoff coefficient sends more water into surface flow.</Insight>
       </div>
     </div>
   );
